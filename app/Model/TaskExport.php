@@ -44,7 +44,7 @@ class TaskExport extends Base
      */
     public function getTasks($project_id, $from, $to)
     {
-        $sql = '
+        $sql = "
             SELECT
             tasks.id,
             projects.name AS project_name,
@@ -58,6 +58,7 @@ class TaskExport extends Base
             users.username AS assignee_username,
             tasks.score,
             tasks.title,
+            TRIM(REPLACE(tasks.description, '\r\n', ' ')) AS description,
             tasks.date_creation,
             tasks.date_modification,
             tasks.date_completed,
@@ -71,7 +72,7 @@ class TaskExport extends Base
             LEFT JOIN columns ON columns.id = tasks.column_id
             LEFT JOIN projects ON projects.id = tasks.project_id
             WHERE tasks.date_creation >= ? AND tasks.date_creation <= ? AND tasks.project_id = ?
-        ';
+        ";
 
         if (! is_numeric($from)) {
             $from = $this->dateParser->resetDateToMidnight($this->dateParser->getTimestamp($from));
@@ -125,6 +126,7 @@ class TaskExport extends Base
             e('Assignee'),
             e('Complexity'),
             e('Title'),
+            e('Description'),
             e('Creation date'),
             e('Modification date'),
             e('Completion date'),
